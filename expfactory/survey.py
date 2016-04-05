@@ -209,7 +209,7 @@ def create_select_table(text,id_attribute,df,classes="",required=0):
     print "ERROR: DataFrame (df) must be a pandas.DataFrame"
 
 
-def create_textarea(text,id_attribute,classes="",rows=3,required=0):
+def create_textarea(text,id_attribute,classes="",box_text=None,rows=3,required=0):
     '''create_textarea generates a material lite multi line text field with a text prompt.
     :param text: A text prompt to put before the text field
     :param id_attribute: the unique id for the question
