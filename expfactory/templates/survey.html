@@ -71,7 +71,8 @@ $( document ).ready(function() {
         // Save data to browser
         var $inputs = $("input:checked");
         var $text = $("input:text")
-        var $elements = $inputs.add($text)
+	var $number = $("input[type = number]")
+        var $elements = $inputs.add($text).add($number)
         
         var results = []
         $elements.each(function(index, element) {
@@ -79,7 +80,11 @@ $( document ).ready(function() {
 
           if ($.inArray( $(element).attr("name"), [ "forward", "backward", "process"] ) == -1) {
               result.name = $(element).attr("name");
-              result.value = $(element).attr("value");
+              if ($(element).attr("value") == undefined) {
+                result.value = $(element).val();
+                } else {
+                    result.value = $(element).attr("value");
+                }
               result.options = $(element).attr("meta-options");
               result.text = $(element).attr("meta-text");
               results.push(result);

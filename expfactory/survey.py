@@ -289,26 +289,27 @@ def export_textfield(text,id_attribute,required=0):
 def parse_validation(required_counts):
     '''parse_validation parses code to validate each step
     :param page_count: the total number of pages for the survey (called "steps")
-    :param question_counts: 
     '''
     validation = ""
     current_page = 1
     pages = required_counts.keys()
     pages.sort()
     for page_number in pages:
-        required_questions = required_counts[page_number]
         if current_page == 1:
             validation = "%s if ( state.stepIndex === %s ) {\n" %(validation,page_number)
         else:
             validation = "%s else if ( state.stepIndex === %s ) {\n" %(validation,page_number)
-        validation = '%s if (($(".page%s.required:checked").length + $(".page%s.required:text").filter(function() { return $(this).val();}).length) != %s){\nis_required($(".page%s.required:not(checked)"));\nreturn false;\n' %(validation,page_number,page_number,required_questions,page_number)
-        # If we are at the last page, passing validation should enable the submit
+	validation = "%s if (($.unique($('.page%s.required[type=number],.page3.required:text').map(function(){return this.name})).map(function() {return $('[name*=' + this + '].required[type=number], [name*=' + this + '].required:text').filter(function() { return $(this).val();}).length > 0}).get().indexOf(false) != -1) || ($.unique($('.page%s.required:not([type=number]):not(:text)').map(function(){return this.name})).map(function() {return $('[name*=' + this + '].required:checked').length > 0}).get().indexOf(false) != -1)){\nis_required($('.page%s.required:not(checked)'));\nreturn false;\n" % (validation, page_number, page_number, page_number)
+        
+
+	# If we are at the last page, passing validation should enable the submit
         if page_number == pages[-1]:
             validation = '%s } else {\nexpfactory_finished=true;\n' %(validation)
         validation = '%s}}' %(validation)
         current_page+=1
 
     return validation
+
 
 
 def read_survey_file(question_file,delim="\t"):
