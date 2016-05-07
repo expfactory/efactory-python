@@ -313,8 +313,9 @@ def parse_validation(required_counts):
             validation = "%s if ( state.stepIndex === %s ) {\n" %(validation,page_number)
         else:
             validation = "%s else if ( state.stepIndex === %s ) {\n" %(validation,page_number)
-	validation = "%s if (($.unique($('.page%s.required[type=number],.page3.required:text').map(function(){return this.name})).map(function() {return $('[name*=' + this + '].required[type=number], [name*=' + this + '].required:text').filter(function() { return $(this).val();}).length > 0}).get().indexOf(false) != -1) || ($.unique($('.page%s.required:not([type=number]):not(:text)').map(function(){return this.name})).map(function() {return $('[name*=' + this + '].required:checked').length > 0}).get().indexOf(false) != -1)){\nis_required($('.page%s.required:not(checked)'));\nreturn false;\n" % (validation, page_number, page_number, page_number)
+	validation = '%s if (($.unique($(`.page%s.required[type=number],.page%s.required:text`).map(function(){return $(this).attr(`meta-text`)})).map(function() {return $(`[meta-text*="` + this + `"].required[type=number], [meta-text*="` + this + `"].required:text`).filter(function() { return $(this).val();}).length > 0}).get().indexOf(false) != -1) || ($.unique($(`.page%s.required:not([type=number]):not(:text)`).map(function(){return $(this).attr(`meta-text`)})).map(function() {return $(`[meta-text*="` + this + `"].required:checked`).length > 0}).get().indexOf(false) != -1)){\nis_required($(`.page%s.required:not(checked)`));\nreturn false;\n' % (validation, page_number, page_number, page_number, page_number)
         
+
 
 	# If we are at the last page, passing validation should enable the submit
         if page_number == pages[-1]:
