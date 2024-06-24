@@ -134,7 +134,7 @@ def create_checkbox(text,id_attribute,options,classes="",required=0):
     checkbox_html = '<p id="%s_options">%s</p>' %(id_attribute,text)
     for n in range(len(options)):
         option_id = "%s_%s" %(id_attribute,n)
-        checkbox_html = '%s\n<label class="%s" for="checkbox-%s">\n<input type="checkbox" id="checkbox-%s" %s class="mdl-checkbox__input %s %s" name="%s_options" value="%s">\n<span class="mdl-checkbox__label">%s</span>\n</label>' %(checkbox_html,class_names,option_id,option_id,meta,classes,required,option_id,options[n],options[n])
+        checkbox_html = '%s\n<label class="%s" for="checkbox-%s">\n<input type="checkbox" id="checkbox-%s" %s class="mdl-checkbox__input %s %s" name="%s_options" value="%s">\n<span class="mdl-checkbox__label">%s</span>\n</label>' %(checkbox_html,class_names,option_id,option_id,meta,classes,required,id_attribute,options[n],options[n])
     return "%s<br><br><br>" %(checkbox_html)
     
 def base_textfield(text,id_attribute,box_text=None):
