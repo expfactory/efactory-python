@@ -15,7 +15,7 @@ import re
 
 
 def generate_base(battery_dest,tasks=None,experiment_repo=None,survey_repo=None,game_repo=None,
-                  add_experiments=True,add_surveys=True,add_games=True,battery_repo=None,warning=True):
+                  battery_repo=None,warning=True):
     '''generate_base returns a folder with downloaded experiments, surveys, and battery, either specified by the user or a temporary directory, to be used by generate_local and generate (for psiturk)
     :param battery_dest: [required] is the output folder for your battery. This folder MUST NOT EXIST.
     :param battery_repo: location of psiturk-battery repo to use as a template. If not specified, will be downloaded to a temporary directory
@@ -24,16 +24,16 @@ def generate_base(battery_dest,tasks=None,experiment_repo=None,survey_repo=None,
     :param tasks: a list of experiments and surveys, meaning the "exp_id" variable in the config.json, to include. This variable also conincides with the tasks folder name.
     :param warning: show warnings when validating experiments (default True)
     '''
-    if experiment_repo == None or battery_repo == None or survey_repo == None or game_repo == None:
-        tmpdir = custom_battery_download()
-        if experiment_repo == None:
-            experiment_repo = "%s/experiments" %(tmpdir)     
-        if battery_repo == None:
-            battery_repo = "%s/battery" %(tmpdir)     
-        if survey_repo == None:
-            survey_repo = "%s/surveys" %(tmpdir)     
-        if game_repo == None:
-            game_repo = "%s/games" %(tmpdir)     
+    repos = []
+    tmpdir = None
+    if battery_repo == None:
+        tmpdir = custom_battery_download(repos=['battery'])
+        battery_repo = "%s/battery" %(tmpdir) 
+    if experiment_repo == None and survey_repo == None and game_repo == None:
+        tmpdir = custom_battery_download(tmpdir, ['experiments', 'surveys', 'games'])
+        experiment_repo = "%s/experiments" %(tmpdir)      
+        survey_repo = "%s/surveys" %(tmpdir)     
+        game_repo = "%s/games" %(tmpdir)     
 
 
     # Copy battery skeleton to destination
@@ -41,13 +41,12 @@ def generate_base(battery_dest,tasks=None,experiment_repo=None,survey_repo=None,
     valid_experiments = []
     valid_surveys = []
     valid_games = []
-    if add_experiments == True:
+    if experiment_repo is not None:
         valid_experiments = get_experiments(experiment_repo,warning=warning)
-    if add_surveys == True:
+    if survey_repo is not None:
         valid_surveys = get_experiments(survey_repo,warning=warning,repo_type="surveys")
-    if add_games == True:
+    if game_repo is not None:
         valid_games = get_experiments(game_repo,warning=warning,repo_type="games")
-
     # If the user wants to select a subset
     if tasks != None:
         valid_experiments = [x for x in valid_experiments if os.path.basename(x) in [os.path.basename(e) for e in tasks]]
@@ -80,14 +79,11 @@ def generate_local(battery_dest=None,subject_id=None,battery_repo=None,experimen
 
     # We can only generate a battery to a folder that does not exist, to be safe
     if not os.path.exists(battery_dest):
-
         base = generate_base(battery_dest=battery_dest,
                              tasks=experiments,
                              experiment_repo=experiment_repo,
                              battery_repo=battery_repo,
-                             warning=warning,
-                             add_surveys=False)
-
+                             warning=warning)
         # We will output a local battery template (without psiturk) 
         template_exp = "%s/templates/localbattery.html" %get_installdir()
         template_exp_output = "%s/index.html" %(battery_dest)
@@ -100,7 +96,6 @@ def generate_local(battery_dest=None,subject_id=None,battery_repo=None,experimen
         custom_variables = dict()
         custom_variables["exp"] = [("[SUB_SUBJECT_ID_SUB]",subject_id)]
         custom_variables["load"] = [("[SUB_TOTALTIME_SUB]",time)]
-
         # Fill in templates with the experiments
         template_experiments(battery_dest=battery_dest,
                              battery_repo=base["battery_repo"],
